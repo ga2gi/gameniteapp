@@ -1,0 +1,105 @@
+/* src/app.css - global theme and resets (vanilla CSS) */
+
+/* Theme variables */
+:root{
+  --color-primary: #ff6600;   /* orange CTA */
+  --color-secondary: #212121; /* dark text */
+  --color-bg: #ffffff;        /* background */
+  --color-muted: #6b7280;     /* gray text */
+  --radius: 10px;
+  --gap: 1rem;
+  --font-heading: "Poppins", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+}
+
+/* Basic reset */
+*{box-sizing:border-box}
+html,body,#svelte{height:100%}
+body{
+  margin:0;
+  font-family:var(--font-body);
+  background:var(--color-bg);
+  color:var(--color-secondary);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* Layout helpers */
+.container{
+  max-width:1080px;
+  margin:0 auto;
+  padding:2rem;
+}
+
+/* Simple header styles */
+.app-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:var(--gap);
+  padding:1rem 2rem;
+  border-bottom:1px solid #eee;
+  background:#fff;
+}
+
+.brand {
+  display:flex;
+  align-items:center;
+  gap:0.75rem;
+  font-family:var(--font-heading);
+  font-weight:700;
+  color:var(--color-secondary);
+}
+
+.nav-links a{
+  margin-left:1rem;
+  color:var(--color-secondary);
+  text-decoration:none;
+  font-weight:600;
+}
+.nav-links a:hover{ color:var(--color-primary) }
+
+/* Footer */
+.app-footer{
+  padding:1rem 2rem;
+  border-top:1px solid #eee;
+  text-align:center;
+  font-size:0.9rem;
+  color:var(--color-muted);
+}
+
+/* Buttons */
+.btn {
+  display:inline-block;
+  padding:0.6rem 1rem;
+  border-radius:var(--radius);
+  border:0;
+  cursor:pointer;
+  font-weight:700;
+  text-decoration:none;
+}
+.btn-primary {
+  background:var(--color-primary);
+  color:#fff;
+}
+.btn-ghost {
+  background:transparent;
+  color:var(--color-secondary);
+  border:1px solid #e6e6e6;
+}
+
+/* Simple card */
+.card {
+  background:#fff;
+  border:1px solid #f0f0f0;
+  border-radius:12px;
+  padding:1rem;
+  box-shadow:0 1px 3px rgba(0,0,0,0.03);
+}
+
+/* Responsive grid for dashboard */
+.grid {
+  display:grid;
+  gap:1rem;
+  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+}
