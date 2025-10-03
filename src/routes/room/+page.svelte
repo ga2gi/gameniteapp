@@ -1,49 +1,52 @@
 <script lang="ts">
+  import { page } from '$app/stores';
   import { goto } from '$app/navigation';
 
-  let joinCode: string = '';
+  // Room code from URL
+  $: roomCode = $page.params.code;
 
-  // Generate a random room code
-  function createRoom() {
-    const code = Math.random().toString(36).substring(2, 6).toUpperCase();
-    goto(`/room/${code}`);
+  function leaveRoom() {
+    goto('/room');
   }
 
-  // Join existing room
-  function joinRoom() {
-    if (joinCode.trim() !== '') {
-      goto(`/room/${joinCode.trim().toUpperCase()}`);
-    }
+  function goToGame(game: string) {
+    goto(`/room/${roomCode}/${game}`);
   }
 </script>
 
 <div class="page">
-  <h1 class="title">🎮 Game Rooms</h1>
+  <h1 class="title">🏠 Room Lobby</h1>
   <p class="description">
-    Rooms let you and your friends play together. 
-    Create a new room and share the code, or join an existing room to start playing.
+    Welcome to your game room! Share the code with friends so they can join.
   </p>
 
-  <div class="card-container">
-    <!-- Create Room Card -->
-    <div class="card create">
-      <h2>✨ Create Room</h2>
-      <p>Start a new room and invite others by sharing the room code.</p>
-      <button class="btn" on:click={createRoom}>Create Room</button>
-    </div>
+  <div class="card">
+    <h2>Room Code</h2>
+    <p class="room-code">{roomCode}</p>
+  </div>
 
-    <!-- Join Room Card -->
-    <div class="card join">
-      <h2>🔑 Join Room</h2>
-      <p>Enter the room code shared by your friend to join.</p>
-      <input
-        class="input"
-        type="text"
-        placeholder="Enter code"
-        bind:value={joinCode}
-      />
-      <button class="btn" on:click={joinRoom}>Join Room</button>
+  <h2 class="subtitle">🎮 Choose a Game</h2>
+  <div class="games">
+    <div class="game-card trivia" on:click={() => goToGame("trivia")}>
+      <h3>❓ Trivia</h3>
+      <p>Test your knowledge with timed questions.</p>
     </div>
+    <div class="game-card charades" on:click={() => goToGame("charades")}>
+      <h3>🎭 Charades</h3>
+      <p>Act it out and let your friends guess!</p>
+    </div>
+    <div class="game-card murder" on:click={() => goToGame("murder")}>
+      <h3>🔪 Murder Mystery</h3>
+      <p>Find out who the imposter is before it's too late.</p>
+    </div>
+    <div class="game-card imposter" on:click={() => goToGame("imposter")}>
+      <h3>🕵️ Imposter</h3>
+      <p>Blend in or expose the fake among players.</p>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn secondary" on:click={leaveRoom}>⬅ Leave Room</button>
   </div>
 </div>
 
@@ -56,20 +59,14 @@
   }
 
   .title {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     margin-bottom: 0.5rem;
   }
 
   .description {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: #555;
     margin-bottom: 2rem;
-  }
-
-  .card-container {
-    display: grid;
-    gap: 2rem;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   }
 
   .card {
@@ -77,31 +74,78 @@
     padding: 2rem;
     border-radius: 1rem;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+  }
+
+  .room-code {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #42a5f5;
+    margin-top: 0.5rem;
+  }
+
+  .subtitle {
+    margin: 1rem 0;
+    font-size: 1.5rem;
+  }
+
+  .games {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .game-card {
+    padding: 1.5rem;
+    border-radius: 1rem;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     text-align: left;
   }
 
-  .card h2 {
-    margin-bottom: 0.5rem;
+  .game-card h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.3rem;
   }
 
-  .card p {
-    margin-bottom: 1rem;
-    color: #444;
+  .game-card p {
+    margin: 0;
+    font-weight: normal;
   }
 
-  .card.create {
-    border-left: 8px solid #42a5f5; /* Blue */
+  .game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
   }
 
-  .card.join {
-    border-left: 8px solid #66bb6a; /* Green */
+  .trivia {
+    background: #42a5f5;
+  }
+
+  .charades {
+    background: #ab47bc;
+  }
+
+  .murder {
+    background: #ef5350;
+  }
+
+  .imposter {
+    background: #66bb6a;
+  }
+
+  .actions {
+    margin-top: 2rem;
   }
 
   .btn {
     background: #42a5f5;
     color: #fff;
     border: none;
-    padding: 0.7rem 1.2rem;
+    padding: 0.7rem 1.4rem;
     border-radius: 0.5rem;
     cursor: pointer;
     font-size: 1rem;
@@ -112,13 +156,12 @@
     background: #1e88e5;
   }
 
-  .input {
-    display: block;
-    width: 100%;
-    padding: 0.6rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 0.5rem;
-    font-size: 1rem;
+  .btn.secondary {
+    background: #ccc;
+    color: #333;
+  }
+
+  .btn.secondary:hover {
+    background: #aaa;
   }
 </style>
