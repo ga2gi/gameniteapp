@@ -1,88 +1,53 @@
-<script>
-  // No logic yet, just a styled welcome page
-</script>
-
-<div class="home-box">
-  <h1>🎉 Welcome to GameNite Kenya</h1>
-  <p class="tagline">Your ultimate hub for fun, laughter, and games with friends!</p>
-
-  <p class="desc">
-    Join GameNite Kenya and enjoy exciting multiplayer games like 
-    <strong>Trivia</strong>, <strong>Charades</strong>, <strong>Murder Mystery</strong>, and more.  
-    Play solo or with friends — anytime, anywhere.  
-  </p>
-
-  <div class="cta-buttons">
-    <a href="/dashboard" class="btn primary">🚀 Go to Dashboard</a>
-    <a href="/subscribe" class="btn secondary">✨ Subscribe Now</a>
-  </div>
+<div class="homepage">
+  <header class="hero">
+    <h1 class="title">🎮 GameNite</h1>
+    <p class="subtitle">Your hub for fun party games — solo or with friends.</p>
+    <a href="/dashboard" class="btn-primary">Get Started</a>
+  </header>
 </div>
 
 <style>
-  .home-box {
-    max-width: 700px;
-    margin: 4rem auto;
-    text-align: center;
-    background: var(--bg, #fff);
-    padding: 3rem 2rem;
-    border-radius: 20px;
-    box-shadow: 0 8px 18px rgba(0,0,0,0.15);
-  }
-
-  h1 {
-    font-size: 2.5rem;
-    color: var(--primary, #ff6f61);
-    margin-bottom: 0.5rem;
-  }
-
-  .tagline {
-    font-size: 1.3rem;
-    margin-bottom: 1.5rem;
-    color: var(--secondary, #42a5f5);
-    font-weight: bold;
-  }
-
-  .desc {
-    font-size: 1.1rem;
-    margin-bottom: 2.5rem;
-    line-height: 1.6;
-    color: var(--text, #333);
-  }
-
-  .cta-buttons {
+  .homepage {
+    height: 100vh;
     display: flex;
+    align-items: center;
     justify-content: center;
-    gap: 1rem;
-    flex-wrap: wrap;
+    text-align: center;
+    background: linear-gradient(135deg, #42a5f5, #ab47bc);
+    color: white;
+    padding: 2rem;
   }
 
-  .btn {
+  .hero {
+    max-width: 700px;
+  }
+
+  .title {
+    font-size: 3.2rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+  }
+
+  .subtitle {
+    font-size: 1.4rem;
+    margin-bottom: 2rem;
+    color: #f1f1f1;
+  }
+
+  .btn-primary {
+    display: inline-block;
     padding: 1rem 2rem;
+    background: white;
+    color: #333;
     border-radius: 12px;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: bold;
     text-decoration: none;
-    transition: transform 0.2s ease, background 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transition: transform 0.2s ease, background 0.2s ease;
   }
 
-  .btn.primary {
-    background: var(--primary, #ff6f61);
-    color: #fff;
-  }
-
-  .btn.primary:hover {
-    background: #e6554b;
-    transform: translateY(-3px);
-  }
-
-  .btn.secondary {
-    background: var(--secondary, #42a5f5);
-    color: #fff;
-  }
-
-  .btn.secondary:hover {
-    background: #1e88e5;
-    transform: translateY(-3px);
+  .btn-primary:hover {
+    background: #f9f9f9;
+    transform: translateY(-4px);
   }
 </style>
