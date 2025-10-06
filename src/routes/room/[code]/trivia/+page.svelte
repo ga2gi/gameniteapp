@@ -6,7 +6,7 @@
   let questions = [];
   let currentIndex = 0;
   let score = 0;
-  let timeLeft = 20;
+  let timeLeft = 30;
   let showResult = false;
   let gameStarted = false;
   let answered = false;
@@ -42,7 +42,7 @@
 
   function startTimer() {
     clearInterval(timer);
-    timeLeft = 20;
+    timeLeft = 30;
     timer = setInterval(() => {
       timeLeft -= 0.1; // smooth decrement
       if (timeLeft <= 0) {
@@ -210,7 +210,7 @@
     <div class="timer-container">
       <div
         class="timer-bar"
-        style="width: {(timeLeft / 10) * 100}%; background: {timeLeft <= 5 ? '#dc2626' : '#16a34a'}"
+        style="width: {(timeLeft / 30) * 100}%; background: {timeLeft <= 15 ? '#dc2626' : '#16a34a'}"
       ></div>
     </div>
 
