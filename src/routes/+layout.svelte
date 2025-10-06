@@ -12,7 +12,7 @@
     <a href="/">Home</a>
     <a href="/dashboard">Dashboard</a>
     <a href="/room">Room</a>
-    <a href="/trivia">Trivia</a>
+    <a href="/nationwide">nationwideGames</a>
   </nav>
 
   <button class="menu-btn" on:click={toggleMenu}>
@@ -104,7 +104,7 @@
     top: 64px;
     left: 0;
     width: 100%;
-    border-top: 2px solid #ff7c4dff;
+    border-top: 2px solid #45685bff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     z-index: 100;
   }

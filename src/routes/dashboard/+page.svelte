@@ -11,10 +11,10 @@
   ];
 
   const roomGames = [
-    { name: "Trivia", path: "/games/trivia", color: "#66bb6a" },
-    { name: "Imposter", path: "/games/imposter", color: "#ab47bc" },
-    { name: "Murder Mystery", path: "/games/murder-mystery", color: "#ffa726" },
-    { name: "Charades", path: "/games/charades", color: "#26c6da" }
+    { name: "Trivia", path: "/trivia", color: "#66bb6a" },
+    { name: "Imposter", path: "/imposter", color: "#ab47bc" },
+    { name: "Murder Mystery", path: "/murder-mystery", color: "#ffa726" },
+    { name: "Charades", path: "/charades", color: "#26c6da" }
   ];
 </script>
 
@@ -39,7 +39,7 @@
       {/each}
     </div>
 
-    <a href="/games/nationwide-trivia" class="btn secondary">Play Nationwide Games</a>
+    <a href="/nationwide" class="btn secondary">Play Nationwide Games</a>
   </div>
 
   <!-- Rooms Section -->
