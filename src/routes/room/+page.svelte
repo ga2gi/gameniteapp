@@ -1,167 +1,85 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-  import { goto } from '$app/navigation';
+  import { onMount } from 'svelte';
 
-  // Room code from URL
-  $: roomCode = $page.params.code;
+  let roomCode = '';
+  let joinCode = '';
+  let players = ["Alice", "Bob", "Charlie"]; // mock players
+  let games = [
+    { name: "Trivia", color: "#42a5f5" },
+    { name: "Charades", color: "#ffa726" },
+    { name: "Murder Mystery", color: "#ab47bc" },
+    { name: "Imposter", color: "#66bb6a" }
+  ];
 
-  function leaveRoom() {
-    goto('/room');
+  function createRoom() {
+    if (!roomCode) roomCode = Math.random().toString(36).substring(2, 7).toUpperCase();
+    if (!players.includes("You")) players = ["You", ...players];
+    alert(`Room ${roomCode} created!`);
   }
 
-  function goToGame(game: string) {
-    goto(`/room/${roomCode}/${game}`);
+  function joinRoom() {
+    if (!joinCode) return alert("Enter room code");
+    roomCode = joinCode.toUpperCase();
+    if (!players.includes("You")) players = [...players, "You"];
+    alert(`Joined room ${roomCode}`);
+    joinCode = '';
   }
 </script>
 
-<div class="page">
-  <h1 class="title">🏠 Room Lobby</h1>
-  <p class="description">
-    Welcome to your game room! Share the code with friends so they can join.
-  </p>
+<div class="room-container">
+  <h1>🎮 Room Lobby</h1>
 
-  <div class="card">
-    <h2>Room Code</h2>
-    <p class="room-code">{roomCode}</p>
-  </div>
-
-  <h2 class="subtitle">🎮 Choose a Game</h2>
-  <div class="games">
-    <div class="game-card trivia" on:click={() => goToGame("trivia")}>
-      <h3>❓ Trivia</h3>
-      <p>Test your knowledge with timed questions.</p>
+  <div class="room-actions">
+    <div class="create-room">
+      <button class="btn create" on:click={createRoom}>Create Room</button>
+      <p>or share code: {roomCode || "----"}</p>
     </div>
-    <div class="game-card charades" on:click={() => goToGame("charades")}>
-      <h3>🎭 Charades</h3>
-      <p>Act it out and let your friends guess!</p>
-    </div>
-    <div class="game-card murder" on:click={() => goToGame("murder")}>
-      <h3>🔪 Murder Mystery</h3>
-      <p>Find out who the imposter is before it's too late.</p>
-    </div>
-    <div class="game-card imposter" on:click={() => goToGame("imposter")}>
-      <h3>🕵️ Imposter</h3>
-      <p>Blend in or expose the fake among players.</p>
+    <div class="join-room">
+      <input type="text" placeholder="Enter Room Code" bind:value={joinCode} />
+      <button class="btn join" on:click={joinRoom}>Join Room</button>
     </div>
   </div>
 
-  <div class="actions">
-    <button class="btn secondary" on:click={leaveRoom}>⬅ Leave Room</button>
-  </div>
+  {#if roomCode}
+    <div class="players-list">
+      <h2>Players in Room {roomCode}</h2>
+      <ul>
+        {#each players as player}
+          <li>{player}</li>
+        {/each}
+      </ul>
+    </div>
+
+    <div class="games-grid">
+      {#each games as game}
+        <div class="game-card" style="--card-color: {game.color}">
+          <h2>{game.name}</h2>
+        </div>
+      {/each}
+    </div>
+  {/if}
 </div>
 
 <style>
-  .page {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 2rem;
-    text-align: center;
-  }
+  .room-container { max-width: 900px; margin: 2rem auto; font-family: "Baloo 2", cursive; text-align: center; }
+  h1 { color: #ff6f61; margin-bottom: 1rem; }
 
-  .title {
-    font-size: 2.2rem;
-    margin-bottom: 0.5rem;
-  }
+  .room-actions { display:flex; justify-content: center; gap:2rem; margin-bottom:2rem; flex-wrap:wrap; }
+  .create-room, .join-room { display:flex; flex-direction:column; gap:0.5rem; align-items:center; }
 
-  .description {
-    font-size: 1.1rem;
-    color: #555;
-    margin-bottom: 2rem;
-  }
+  input { padding:0.6rem; border-radius:8px; border:1px solid #ccc; text-transform:uppercase; }
 
-  .card {
-    background: #fff;
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 2rem;
-  }
+  .btn { padding:0.7rem 1.5rem; border:none; border-radius:12px; color:#fff; font-weight:700; cursor:pointer; transition:transform 0.2s ease; }
+  .btn.create { background:#42a5f5; }
+  .btn.create:hover { background:#1e88e5; transform:translateY(-2px); }
+  .btn.join { background:#66bb6a; }
+  .btn.join:hover { background:#388e3c; transform:translateY(-2px); }
 
-  .room-code {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #42a5f5;
-    margin-top: 0.5rem;
-  }
+  .players-list { background:#fff; padding:1rem 2rem; border-radius:16px; margin-bottom:2rem; box-shadow:0 6px 12px rgba(0,0,0,0.1); }
+  .players-list ul { list-style:none; padding:0; margin:0; }
+  .players-list li { padding:0.4rem 0; font-weight:bold; color:#333; }
 
-  .subtitle {
-    margin: 1rem 0;
-    font-size: 1.5rem;
-  }
-
-  .games {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-  }
-
-  .game-card {
-    padding: 1.5rem;
-    border-radius: 1rem;
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    text-align: left;
-  }
-
-  .game-card h3 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.3rem;
-  }
-
-  .game-card p {
-    margin: 0;
-    font-weight: normal;
-  }
-
-  .game-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
-  }
-
-  .trivia {
-    background: #42a5f5;
-  }
-
-  .charades {
-    background: #ab47bc;
-  }
-
-  .murder {
-    background: #ef5350;
-  }
-
-  .imposter {
-    background: #66bb6a;
-  }
-
-  .actions {
-    margin-top: 2rem;
-  }
-
-  .btn {
-    background: #42a5f5;
-    color: #fff;
-    border: none;
-    padding: 0.7rem 1.4rem;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background 0.2s ease;
-  }
-
-  .btn:hover {
-    background: #1e88e5;
-  }
-
-  .btn.secondary {
-    background: #ccc;
-    color: #333;
-  }
-
-  .btn.secondary:hover {
-    background: #aaa;
-  }
+  .games-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; }
+  .game-card { background:var(--card-color,#eee); color:#fff; padding:2rem; border-radius:16px; font-weight:700; transition:transform 0.2s ease; }
+  .game-card:hover { transform:translateY(-4px); box-shadow:0 8px 16px rgba(0,0,0,0.15);}
 </style>

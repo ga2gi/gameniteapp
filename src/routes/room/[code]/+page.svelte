@@ -1,168 +1,165 @@
 <script lang="ts">
+  import { onMount } from "svelte";
+  import { goto } from "$app/navigation";
+
+  // Games available inside rooms
+  const games = [
+    { name: "Trivia", path: "trivia", color: "#42a5f5" },
+    { name: "Imposter", path: "imposter", color: "#66bb6a" },
+    { name: "Murder Mystery", path: "murder-mystery", color: "#ab47bc" },
+    { name: "Charades", path: "charades", color: "#ffa726" }
+  ];
+
+  let roomCode = "";
+  let joinCode = "";
+
+  // Generate a random room code
+  function generateRoomCode(length = 6) {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let code = "";
+    for (let i = 0; i < length; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+  }
+
+  function createRoom() {
+    roomCode = generateRoomCode();
+    goto(`/room/${roomCode}`);
+  }
+
+  function joinRoom() {
+    if (!joinCode) {
+      alert("Please enter a room code to join.");
+      return;
+    }
+    goto(`/room/${joinCode.toUpperCase()}`);
+  }
+
+  // If dynamic route, extract room code from URL
   import { page } from '$app/stores';
-  import { goto } from '$app/navigation';
-
-  // Room code from URL
-  $: roomCode = $page.params.code;
-
-  function leaveRoom() {
-    goto('/room');
-  }
-
-  function startGame(game: string) {
-    // Later this should route to actual game page
-    alert(`Starting ${game} in room ${roomCode}!`);
-  }
+  $: currentRoom = $page.params.code || roomCode;
 </script>
 
-<div class="page">
-  <h1 class="title">🏠 Room Lobby</h1>
-  <p class="description">
-    Welcome to your game room! Share the code with friends so they can join.
-  </p>
+<div class="room-container">
+  {#if !currentRoom}
+    <h1>🎮 GameNite Rooms</h1>
+    <div class="room-actions">
+      <button class="btn create" on:click={createRoom}>Create Room</button>
+      <div class="join-box">
+        <input
+          type="text"
+          placeholder="Enter Room Code"
+          bind:value={joinCode}
+          maxlength="6"
+        />
+        <button class="btn join" on:click={joinRoom}>Join Room</button>
+      </div>
+    </div>
+  {:else}
+    <h1>Room: {currentRoom}</h1>
+    <p class="room-info">Invite friends with this code or play solo in multiplayer games.</p>
 
-  <div class="card">
-    <h2>Room Code</h2>
-    <p class="room-code">{roomCode}</p>
-  </div>
+    <div class="games-grid">
+      {#each games as game}
+        <a class="game-card" href={`/room/${currentRoom}/${game.path}`} style="--card-color: {game.color}">
+          <h2>{game.name}</h2>
+        </a>
+      {/each}
+    </div>
 
-  <h2 class="subtitle">🎮 Choose a Game</h2>
-  <div class="games">
-    <div class="game-card trivia" on:click={() => startGame("Trivia")}>
-      <h3>❓ Trivia</h3>
-      <p>Test your knowledge with timed questions.</p>
+    <div class="back-btn">
+      <a href="/dashboard" class="btn back">⬅ Back to Dashboard</a>
     </div>
-    <div class="game-card charades" on:click={() => startGame("Charades")}>
-      <h3>🎭 Charades</h3>
-      <p>Act it out and let your friends guess!</p>
-    </div>
-    <div class="game-card murder" on:click={() => startGame("Murder Mystery")}>
-      <h3>🔪 Murder Mystery</h3>
-      <p>Find out who the killer is before it's too late.</p>
-    </div>
-    <div class="game-card imposter" on:click={() => startGame("Imposter")}>
-      <h3>🕵️ Imposter</h3>
-      <p>Blend in or expose the fake among players.</p>
-    </div>
-  </div>
-
-  <div class="actions">
-    <button class="btn secondary" on:click={leaveRoom}>⬅ Leave Room</button>
-  </div>
+  {/if}
 </div>
 
 <style>
-  .page {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 2rem;
-    text-align: center;
-  }
+.room-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  text-align: center;
+  padding: 0 1rem;
+  font-family: "Baloo 2", cursive, system-ui, sans-serif;
+}
 
-  .title {
-    font-size: 2.2rem;
-    margin-bottom: 0.5rem;
-  }
+h1 {
+  font-size: 2rem;
+  color: #ff6f61;
+  margin-bottom: 1rem;
+}
 
-  .description {
-    font-size: 1.1rem;
-    color: #555;
-    margin-bottom: 2rem;
-  }
+.room-info {
+  font-weight: bold;
+  margin-bottom: 2rem;
+  color: #555;
+}
 
-  .card {
-    background: #fff;
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 2rem;
-  }
+.room-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
 
-  .room-code {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #42a5f5;
-    margin-top: 0.5rem;
-  }
+.join-box {
+  display: flex;
+  gap: 0.5rem;
+}
 
-  .subtitle {
-    margin: 1rem 0;
-    font-size: 1.5rem;
-  }
+.join-box input {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 2px solid #ccc;
+  text-transform: uppercase;
+}
 
-  .games {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-  }
+.btn {
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  color: #fff;
+}
 
-  .game-card {
-    padding: 1.5rem;
-    border-radius: 1rem;
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    text-align: left;
-  }
+.btn.create { background: #42a5f5; }
+.btn.create:hover { background: #1e88e5; transform: translateY(-3px); }
 
-  .game-card h3 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.3rem;
-  }
+.btn.join { background: #66bb6a; }
+.btn.join:hover { background: #43a047; transform: translateY(-3px); }
 
-  .game-card p {
-    margin: 0;
-    font-weight: normal;
-  }
+.btn.back { background: #ff6f61; text-decoration: none; }
+.btn.back:hover { background: #e53935; transform: translateY(-3px); }
 
-  .game-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
-  }
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
 
-  .trivia {
-    background: #42a5f5;
-  }
+.game-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card-color, #eee);
+  border-radius: 18px;
+  padding: 2rem;
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 1.2rem;
+  text-align: center;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
 
-  .charades {
-    background: #ab47bc;
-  }
-
-  .murder {
-    background: #ef5350;
-  }
-
-  .imposter {
-    background: #66bb6a;
-  }
-
-  .actions {
-    margin-top: 2rem;
-  }
-
-  .btn {
-    background: #42a5f5;
-    color: #fff;
-    border: none;
-    padding: 0.7rem 1.4rem;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background 0.2s ease;
-  }
-
-  .btn:hover {
-    background: #1e88e5;
-  }
-
-  .btn.secondary {
-    background: #ccc;
-    color: #333;
-  }
-
-  .btn.secondary:hover {
-    background: #aaa;
-  }
+.game-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+  background: linear-gradient(135deg, var(--card-color), #333);
+}
 </style>

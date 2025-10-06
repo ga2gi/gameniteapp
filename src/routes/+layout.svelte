@@ -44,7 +44,7 @@
   }
 
   header {
-    background: linear-gradient(90deg, #ff6f61, #a39362ff);
+    background: linear-gradient(90deg, #53786eff, #86b392ff);
     padding: 1rem 2rem;
     color: #fff;
   }
