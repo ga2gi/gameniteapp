@@ -1,143 +1,240 @@
-<script lang="ts">
-  import { page } from '$app/stores';
-  import { onMount } from 'svelte';
+<script>
+  import { onMount } from "svelte";
 
-  // Extract room code from URL
-  $: roomCode = $page.params.code;
-
-  // Mock trivia questions
-  let questions = [
-    {
-      question: "What's the capital of Kenya?",
-      options: ["Nairobi", "Mombasa", "Kisumu", "Nakuru"],
-      correct: 0
-    },
-    {
-      question: "Which year did Kenya gain independence?",
-      options: ["1960", "1963", "1970", "1955"],
-      correct: 1
-    },
-    {
-      question: "Who is the author of 'Weep Not, Child'?",
-      options: ["Ngugi wa Thiong'o", "Chinua Achebe", "Wole Soyinka", "Nadine Gordimer"],
-      correct: 0
-    }
-  ];
-
+  let categories = [];
+  let selectedCategory = "";
+  let questions = [];
   let currentIndex = 0;
-  let selected = null;
   let score = 0;
+  let timeLeft = 10;
   let showResult = false;
-
-  // Timer for each question
-  let timeLeft = 5; // 5 seconds
+  let gameStarted = false;
+  let answered = false;
+  let selectedOption = "";
   let timer;
 
-  const nextQuestion = () => {
-    if (selected === questions[currentIndex].correct) score++;
-    selected = null;
-    currentIndex++;
-    timeLeft = 5;
-
-    if (currentIndex >= questions.length) {
-      showResult = true;
-      clearInterval(timer);
-    }
-  };
-
-  const selectOption = (index) => {
-    selected = index;
-  };
-
-  onMount(() => {
-    timer = setInterval(() => {
-      timeLeft--;
-      if (timeLeft <= 0) nextQuestion();
-    }, 1000);
+  onMount(async () => {
+    const res = await fetch("https://opentdb.com/api_category.php");
+    const data = await res.json();
+    categories = data.trivia_categories;
   });
+
+  async function startGame() {
+    if (!selectedCategory) return alert("Please select a category!");
+    const res = await fetch(
+      `https://opentdb.com/api.php?amount=10&category=${selectedCategory}&type=multiple`
+    );
+    const data = await res.json();
+    questions = data.results.map((q) => {
+      const options = [...q.incorrect_answers];
+      const randomIndex = Math.floor(Math.random() * 4);
+      options.splice(randomIndex, 0, q.correct_answer);
+      return { question: q.question, options, answer: q.correct_answer };
+    });
+    currentIndex = 0;
+    score = 0;
+    showResult = false;
+    gameStarted = true;
+    answered = false;
+    selectedOption = "";
+    startTimer();
+  }
+
+  function startTimer() {
+    clearInterval(timer);
+    timeLeft = 10;
+    timer = setInterval(() => {
+      timeLeft -= 0.1; // smooth decrement
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        nextQuestion();
+      }
+    }, 100);
+  }
+
+  function answerQuestion(option) {
+    if (answered) return;
+    answered = true;
+    selectedOption = option;
+    if (option === questions[currentIndex].answer) score++;
+    clearInterval(timer);
+    setTimeout(() => nextQuestion(), 1500);
+  }
+
+  function nextQuestion() {
+    answered = false;
+    selectedOption = "";
+    if (currentIndex < questions.length - 1) {
+      currentIndex++;
+      startTimer();
+    } else {
+      showResult = true;
+      gameStarted = false;
+    }
+  }
+
+  function optionClass(option) {
+    if (!answered) return "";
+    if (option === questions[currentIndex].answer) return "correct";
+    if (option === selectedOption && option !== questions[currentIndex].answer)
+      return "wrong";
+    return "";
+  }
 </script>
 
-<div class="trivia-container">
-  <h1>🧠 Trivia - Room {roomCode}</h1>
-
-  {#if showResult}
-    <div class="result">
-      <h2>Your Score: {score} / {questions.length}</h2>
-      <a href={`/room/${roomCode}`} class="btn">Back to Room Lobby</a>
-    </div>
-  {:else}
-    <div class="question-card">
-      <p class="timer">Time Left: {timeLeft}s</p>
-      <h2>{questions[currentIndex].question}</h2>
-      <div class="options">
-        {#each questions[currentIndex].options as option, i}
-          <button 
-            class:selected={selected === i} 
-            on:click={() => selectOption(i)}
-          >
-            {option}
-          </button>
-        {/each}
-      </div>
-      <button class="btn next" on:click={nextQuestion}>Next</button>
-    </div>
-  {/if}
-</div>
-
 <style>
-  .trivia-container {
-    max-width: 600px;
+  .container {
+    max-width: 700px;
     margin: 2rem auto;
-    font-family: "Baloo 2", cursive, system-ui, sans-serif;
+    padding: 1rem;
     text-align: center;
+    font-family: "Baloo 2", cursive, system-ui, sans-serif;
   }
 
-  h1 { color: #42a5f5; }
-  .question-card { 
-    background: #fff; 
-    padding: 2rem; 
-    border-radius: 16px; 
-    box-shadow: 0 6px 12px rgba(0,0,0,0.1); 
-  }
-
-  .timer {
-    font-weight: bold;
+  h1 {
+    font-size: 2rem;
     margin-bottom: 1rem;
-    color: #e53935;
+    color: #ff6f61;
+  }
+
+  select {
+    padding: 0.8rem 1.2rem;
+    margin-bottom: 1rem;
+    border-radius: 12px;
+    border: 2px solid #ff6f61;
+    font-size: 1rem;
+    font-weight: bold;
+    background: #fff;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+
+  select:hover {
+    border-color: #42a5f5;
   }
 
   button {
-    display: block;
-    width: 100%;
-    padding: 0.7rem;
-    margin: 0.5rem 0;
+    padding: 0.9rem 1.5rem;
+    margin: 0.5rem;
     border-radius: 12px;
     border: none;
+    font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
-    transition: background 0.2s ease, transform 0.2s ease;
+    transition: 0.3s ease;
   }
 
-  button:hover { transform: translateY(-2px); }
+  button:hover {
+    opacity: 0.9;
+  }
 
-  button.selected { background: #42a5f5; color: #fff; }
-
-  .btn.next {
-    margin-top: 1rem;
-    background: #ff6f61;
+  .start-btn {
+    background: #42a5f5;
     color: #fff;
   }
 
-  .btn.next:hover { background: #e53935; }
-
-  .result {
-    background: #fff;
-    padding: 2rem;
-    border-radius: 16px;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+  .question {
+    font-size: 1.3rem;
+    margin: 1rem 0;
+    min-height: 60px;
   }
 
-  .result h2 { color: #66bb6a; }
-  .result .btn { background: #42a5f5; color: #fff; text-decoration: none; padding: 0.7rem 1.2rem; border-radius: 12px; display: inline-block; margin-top: 1rem; }
-  .result .btn:hover { background: #1e88e5; }
+  .options {
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  .option-btn {
+    padding: 1rem;
+    border-radius: 15px;
+    border: 2px solid #ccc;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    background: #fef9f9;
+  }
+
+  .option-btn:hover {
+    transform: scale(1.03);
+    border-color: #ff6f61;
+  }
+
+  .option-btn.correct {
+    background: #16a34a;
+    color: white;
+    border-color: #16a34a;
+  }
+
+  .option-btn.wrong {
+    background: #dc2626;
+    color: white;
+    border-color: #dc2626;
+  }
+
+  .timer-container {
+    background: #ddd;
+    border-radius: 10px;
+    height: 15px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+
+  .timer-bar {
+    height: 100%;
+    transition: width 0.1s linear, background 0.3s ease;
+  }
+
+  .result {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #222;
+    margin-bottom: 1rem;
+  }
 </style>
+
+<div class="container">
+  <h1>🎯 Trivia Challenge</h1>
+
+  {#if !gameStarted && !showResult}
+    <select bind:value={selectedCategory}>
+      <option value="">Select Category</option>
+      {#each categories as cat}
+        <option value={cat.id}>{cat.name}</option>
+      {/each}
+    </select>
+    <br />
+    <button class="start-btn" on:click={startGame}>Start Game</button>
+  {/if}
+
+  {#if gameStarted && questions.length}
+    <div class="timer-container">
+      <div
+        class="timer-bar"
+        style="width: {(timeLeft / 10) * 100}%; background: {timeLeft <= 5 ? '#dc2626' : '#16a34a'}"
+      ></div>
+    </div>
+
+    <div class="question">
+      {currentIndex + 1}. {questions[currentIndex].question}
+    </div>
+
+    <div class="options">
+      {#each questions[currentIndex].options as option}
+        <button
+          class="option-btn {optionClass(option)}"
+          on:click={() => answerQuestion(option)}
+        >
+          {option}
+        </button>
+      {/each}
+    </div>
+  {/if}
+
+  {#if showResult}
+    <div class="result">
+      🎉 Game Over! <br />
+      Your Score: {score} / {questions.length}
+    </div>
+    <button class="start-btn" on:click={startGame}>Play Again</button>
+  {/if}
+</div>
