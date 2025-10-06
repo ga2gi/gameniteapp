@@ -1,130 +1,154 @@
-<script lang="ts">
-  import favicon from '$lib/assets/favicon.svg';
-  let { children } = $props();
+<script>
+  let menuOpen = false;
+
+  const toggleMenu = () => (menuOpen = !menuOpen);
+  const closeMenu = () => (menuOpen = false);
 </script>
 
-<svelte:head>
-  <link rel="icon" href={favicon} />
-  <title>GameNite</title>
-  <!-- Fun font from Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600&display=swap" rel="stylesheet">
-</svelte:head>
+<header class="navbar">
+  <div class="logo">ChezaNite</div>
 
-<header>
-  <nav>
-    <div class="logo">🎮 GameNite</div>
-<div class="links">
-  <a href="/">Home</a>
-  <a href="/dashboard">Dashboard</a>
-  <a href="/games">Games</a>
-  <a href="/auth/login">Sign In</a>
-  <a href="/auth/signup">Sign Up</a>
-  <a href="/subscribe" class="btn">Subscribe</a>
-</div>
+  <nav class="nav-links">
+    <a href="/">Home</a>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/room">Room</a>
+    <a href="/trivia">Trivia</a>
   </nav>
+
+  <button class="menu-btn" on:click={toggleMenu}>
+    {#if menuOpen} ✖ {:else} ☰ {/if}
+  </button>
 </header>
 
-<main>
-  <div class="card">
-    {@render children?.()}
+{#if menuOpen}
+  <div class="mobile-menu">
+    <a href="/" on:click={closeMenu}>Home</a>
+    <a href="/dashboard" on:click={closeMenu}>Dashboard</a>
+    <a href="/room" on:click={closeMenu}>Room</a>
+    <a href="/trivia" on:click={closeMenu}>Trivia</a>
   </div>
+{/if}
+
+<main class="content">
+  <slot />
 </main>
 
-<footer>
-  <p>&copy; {new Date().getFullYear()} GameNite · Play. Laugh. Repeat. 🎉</p>
+<footer class="footer">
+  © {new Date().getFullYear()} <span>ChezaNite</span> — Play, Connect & Compete!
 </footer>
 
 <style>
-  /* Fun font */
-  body {
-    font-family: "Baloo 2", cursive, system-ui, sans-serif;
+  /* General Reset */
+  * {
     margin: 0;
-    background: #fef9f9;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f9fafc;
     color: #333;
   }
 
-  header {
-    background: linear-gradient(90deg, #53786eff, #86b392ff);
-    padding: 1rem 2rem;
-    color: #fff;
-  }
-
-  nav {
+  /* Navbar */
+  .navbar {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    max-width: 1200px;
-    margin: 0 auto;
+    align-items: center;
+    background: linear-gradient(90deg, #7eab8eff, #3e5a4aff);
+    color: white;
+    padding: 1rem 2rem;
+    position: relative;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
   }
 
   .logo {
-    font-size: 1.5rem;
-    font-weight: 700;
-    letter-spacing: 1px;
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -1px;
   }
 
-  .links {
+  .nav-links {
     display: flex;
-    gap: 1.2rem;
+    gap: 1.5rem;
   }
 
-  nav a {
-    color: #fff;
+  .nav-links a {
+    color: white;
     text-decoration: none;
-    font-weight: 600;
-    transition: transform 0.2s ease, color 0.2s ease;
+    font-weight: 500;
+    transition: opacity 0.2s ease;
   }
 
-  nav a:hover {
-    transform: scale(1.1);
-    color: #222;
+  .nav-links a:hover {
+    opacity: 0.7;
   }
 
-  nav a.btn {
-    background: #fff;
-    color: #222;
-    padding: 0.4rem 0.9rem;
-    border-radius: 12px;
-    font-weight: 700;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-    transition: background 0.2s ease, transform 0.2s ease;
+  /* Mobile menu button */
+  .menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    color: white;
+    cursor: pointer;
   }
 
-  nav a.btn:hover {
-    background: #ffd54f;
-    transform: scale(1.05);
-  }
-
-  main {
-    max-width: 1000px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-    min-height: 70vh;
+  /* Mobile Menu */
+  .mobile-menu {
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
-  }
-
-  .card {
-    background: #fff;
-    border-radius: 20px;
-    padding: 2rem;
+    flex-direction: column;
+    background: white;
+    position: absolute;
+    top: 64px;
+    left: 0;
     width: 100%;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-top: 2px solid #ff7c4dff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 100;
   }
 
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-  }
-
-  footer {
-    background: #222;
-    color: #eee;
-    text-align: center;
+  .mobile-menu a {
     padding: 1rem;
+    border-bottom: 1px solid #eee;
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .mobile-menu a:hover {
+    background: #f4f4f4;
+  }
+
+  /* Main content */
+  .content {
+    padding: 2rem;
+    min-height: calc(100vh - 140px);
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    background-color: #222;
+    color: #ccc;
+    padding: 1.2rem;
     font-size: 0.9rem;
-    border-top: 4px solid #ff6f61;
+  }
+
+  .footer span {
+    color: #ff4d79;
+    font-weight: 600;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .nav-links {
+      display: none;
+    }
+
+    .menu-btn {
+      display: block;
+    }
   }
 </style>
